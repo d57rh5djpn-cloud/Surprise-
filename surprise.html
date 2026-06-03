@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Доступна новая миссия! 🗺️</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0f2fe, #dcfce7);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Анимированный фон */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 24px;
+            animation: float 6s linear infinite;
+            bottom: -50px;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0.8; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* Плеер */
+        .audio-player {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 2px solid #2ec4b6;
+            padding: 8px 14px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .audio-player:hover {
+            transform: scale(1.03);
+        }
+        .music-wave {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 13px;
+        }
+        .music-bar {
+            width: 3px;
+            height: 100%;
+            background: #2ec4b6;
+            border-radius: 2px;
+        }
+        .music-bar.animate {
+            animation: wave 0.6s ease infinite alternate;
+        }
+        .music-bar:nth-child(2) { animation-delay: 0.15s; }
+        .music-bar:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes wave {
+            0% { height: 30%; }
+            100% { height: 100%; }
+        }
+        .audio-text {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #0f766e;
+        }
+
+        /* Карточка-интерфейс */
+        .card {
+            background: rgba(255, 255, 255, 0.93);
+            backdrop-filter: blur(12px);
+            padding: 30px 20px;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(15, 118, 110, 0.15);
+            text-align: center;
+            max-width: 440px;
+            width: 92%;
+            z-index: 2;
+            border: 3px solid #2ec4b6;
+            transition: all 0.3s ease;
+            position: relative;
+            margin: 40px 0;
+        }
+
+        /* Игровая шкала прогресса */
+        .progress-container {
+            background: #f1f5f9;
+            border-radius: 50px;
+            padding: 4px;
+            margin-bottom: 20px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .progress-bar {
+            width: 15%;
+            height: 12px;
+            background: linear-gradient(90deg, #2ec4b6, #0f766e);
+            border-radius: 50px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #64748b;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #2ec4b6;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #0f172a;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .highlight {
+            color: #2ec4b6;
+        }
+
+        p {
+            color: #475569;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Выбор опций */
+        .section-title {
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            text-align: left;
+            padding-left: 5px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .select-btn {
+            background: white;
+            border: 2px solid #e2e8f0;
+            padding: 12px 8px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #475569;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 0.9rem;
+        }
+
+        .select-btn:hover {
+            border-color: #2ec4b6;
+            color: #2ec4b6;
+            background: #f0fdfa;
+            transform: translateY(-1px);
+        }
+
+        .select-btn.selected {
+            background: #2ec4b6;
+            border-color: #0f766e;
+            color: white;
+            transform: scale(1.03);
+            box-shadow: 0 4px 10px rgba(46, 196, 182, 0.2);
+        }
+
+        /* Поля для своего варианта */
+        .custom-input-box {
+            display: none;
+            margin-bottom: 15px;
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .custom-input-box input {
+            width: 100%;
+            padding: 11px 15px;
+            border: 2px solid #2ec4b6;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            text-align: center;
+        }
+
+        /* Информационные блоки */
+        .bonus-box, .activity-box, .radar-box {
+            background: #f0fdfa;
+            border: 2px dashed #2ec4b6;
+            padding: 12px 15px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            text-align: left;
+            position: relative;
+        }
+
+        .activity-box {
+            background: #fff7ed;
+            border-color: #f97316;
+            display: none;
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        .radar-box {
+            background: #f5f3ff;
+            border-color: #8b5cf6;
+            margin-top: 15px;
+        }
+
+        .bonus-box h4 { color: #0f766e; font-size: 0.9rem; margin-bottom: 4px; }
+        .activity-box h4 { color: #ea580c; font-size: 0.9rem; margin-bottom: 4px; }
+        .radar-box h4 { color: #6d28d9; font-size: 0.9rem; margin-bottom: 4px; }
+
+        /* Переключатель настроения */
+        .toggle-container {
+            position: absolute;
+            right: 15px;
+            top: 12px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px; width: 14px;
+            left: 3px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #2ec4b6; }
+        input:checked + .slider:before { transform: translateX(14px); }
+
+        /* Главная кнопка активации */
+        .submit-btn {
+            background: #ff9f1c;
+            color: white;
+            font-size: 1.05rem;
+            font-weight: bold;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(255, 159, 28, 0.3);
+            transition: all 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .submit-btn:hover {
+            background: #e68a00;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            background: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+
+        /* Стили финального текста */
+        .waiting-text {
+            background: linear-gradient(45deg, #ff9f1c, #ffbf69);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 900;
+            padding: 14px;
+            border-radius: 50px;
+            margin-top: 18px;
+            box-shadow: 0 6px 18px rgba(255, 159, 28, 0.4);
+            letter-spacing: 1.5px;
+            display: inline-block;
+            width: 100%;
+            animation: pulse 1.2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.04); }
+        }
+
+        /* Экраны */
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Чек-лист инвентаря */
+        .inventory-list {
+            margin-top: 10px;
+        }
+        .inventory-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: #475569;
+            margin-bottom: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            text-align: left;
+        }
+
+        /* Генератор предсказаний */
+        .joke-box {
+            margin-top: 20px;
+            background: #fffdf5;
+            border: 1px dashed #fbcfe8;
+            padding: 12px;
+            border-radius: 16px;
+        }
+        .joke-btn {
+            background: none;
+            border: none;
+            color: #db2777;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            outline: none;
+        }
+        .joke-text {
+            font-size: 0.9rem;
+            color: #475569;
+            margin-top: 8px;
+            font-style: italic;
+            min-height: 20px;
+            line-height: 1.4;
+        }
+
+        /* Таймер и Контакты */
+        .timer-box {
+            font-size: 0.85rem;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 12px;
+            margin-top: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid #e2e8f0;
+        }
+        .timer-digits {
+            color: #0f766e;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+        .contact-hint {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 12px;
+        }
+
+        /* Эффект взрыва конфетти */
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: 50%;
+            left: 50%;
+            opacity: 0;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Музыкальный аудиоплеер (Фоновый чилл-трек) -->
+    <div class="audio-player" onclick="toggleMusic()">
+        <div class="music-wave" id="musicWave">
+            <div class="music-bar"></div>
+            <div class="music-bar"></div>
+            <div class="music-bar"></div>
+        </div>
+        <div class="audio-text" id="audioStatus">МУЗЫКА: OFF</div>
+    </div>
+    
+    <!-- Используем свободный красивый lo-fi эмбиент для атмосферы -->
+    <audio id="bgMusic" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+    <div class="particles" id="particleContainer"></div>
+
+    <div class="card" id="mainCard">
+        <!-- Игровая шкала прогресса -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="status-text" id="statusText">Миссия: Совместный рейд 🛰️</div>
+        </div>
+
+        <!-- ЭКРАН 1: Интерактивный квест -->
+        <div id="screenInvite" class="screen active">
+            <span class="badge">Доступен новый левел 🗺️</span>
+            <h1>Для моей необычной <span class="highlight">подруги</span>!</h1>
+            <p>У руля сегодня ты! Выбирай локацию и удобное время для нашей крутой встречи 4 июня.</p>
+            
+            <!-- ШАГ 1: ВЫБОР МЕСТА -->
+            <div class="section-title">📍 Шаг 1: Выбери локацию:</div>
+            <div class="options-grid" id="locationGrid">
+                <button class="select-btn" onclick="selectLocation('Терренкур')">🍀 Терренкур</button>
+                <button class="select-btn" onclick="selectLocation('Центральный Парк')">🌳 Парк</button>
+                <button class="select-btn" onclick="selectLocation('Уютная Кофейня')">☕ Кофейня</button>
+                <button class="select-btn" id="customLocBtn" onclick="selectLocation('custom')">🔮 Свой вариант</button>
+            </div>
+
+            <!-- Скрытое поле для ввода своего места -->
+            <div class="custom-input-box" id="customLocInput">
+                <input type="text" id="customLocField" placeholder="Куда рванём? (например: ТРЦ Мега)" oninput="validateForm()">
+            </div>
+
+            <!-- ШАГ 2: ВЫБОР ВРЕМЕНИ -->
+            <div class="section-title">⏰ Шаг 2: Выбери тайминг:</div>
+            <div class="options-grid" id="timeGrid">
+                <button class="select-btn time-node" onclick="selectTime('12:00')">12:00</button>
+                <button class="select-btn time-node" onclick="selectTime('14:00')">14:00</button>
+                <button class="select-btn time-node" onclick="selectTime('16:00')">16:00</button>
+                <button class="select-btn time-node" onclick="selectTime('18:00')">18:00</button>
+                <button class="select-btn time-node" onclick="selectTime('10:00')">10:00</button>
+                <button class="select-btn time-node" id="customTimeBtn" onclick="selectTime('custom')">🤔 Своё время</button>
+            </div>
+
+            <!-- Скрытое поле для ввода своего времени -->
+            <div class="custom-input-box" id="customTimeInput">
+                <input type="text" id="customTimeField" placeholder="Введи время (например: 15:30)" oninput="validateForm()">
+            </div>
+
+            <!-- Генератор планов на ходу -->
+            <div class="activity-box" id="activityBox">
+                <h4 id="activityTitle">🎯 Сценарий твоей миссии:</h4>
+                <p style="font-size: 0.85rem; margin-bottom: 0; color: #c2410c;" id="activityDesc">Подбираю варианты...</p>
+            </div>
+
+            <div class="bonus-box">
+                <h4>😎 БОНУС: Настроение!</h4>
+                <p style="font-size: 0.85rem; margin-bottom: 0; color: #64748b; max-width: 80%;">Авто-активация чит-кода на отличный день.</p>
+                <div class="toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="moodToggle" checked onchange="handleMoodToggle()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" disabled onclick="confirmMission()">ПОДТВЕРДИТЬ УЧАСТИЕ 🚀</button>
+        </div>
+
+        <!-- ЭКРАН 2: Результат -->
+        <div id="screenSuccess" class="screen">
+            <h1 style="color: #2ec4b6; font-size: 1.8rem; margin-top: 10px; cursor: pointer;" onclick="burstConfetti()">Контракт подписан! 🎉</h1>
+            <p style="margin-bottom: 15px;">Маршрут построен, данные успешно зафиксированы.</p>
+            
+            <div style="background: #f0fdfa; padding: 18px; border-radius: 16px; border: 2px solid #2ec4b6; margin-bottom: 15px; text-align: left;">
+                <p style="margin-bottom: 6px; font-weight: bold; color: #1e293b;" id="finalLocation">📍 Точка сбора: </p>
+                <p style="margin-bottom: 12px; font-weight: bold; color: #1e293b;" id="finalTime">⏰ Дата и время встречи: 4 июня в </p>
+                
+                <hr style="border: 0; border-top: 1px solid #cbd5e1; margin-bottom: 10px;">
+                
+                <p style="margin-bottom: 8px; font-weight: bold; color: #0f766e; font-size: 0.95rem;">🎒 Твой инвентарь к миссии:</p>
+                <div class="inventory-list">
+                    <div class="inventory-item">✅ Хорошее настроение (100%)</div>
+                    <div class="inventory-item">🔋 Заряженный телефон (чтобы найтись)</div>
+                    <div class="inventory-item">👀 Готовность отлично провести время</div>
+                </div>
+            </div>
+
+            <!-- Радар Уровня Веселья -->
+            <div class="radar-box">
+                <button class="joke-btn" onclick="scanRadar()" style="color: #7c3aed;">📈 Обновить радар локации</button>
+                <p style="font-size: 0.85rem; margin-top: 6px; color: #5b21b6; font-weight: 500;" id="radarText">Все локации работают в режиме повышенного уюта, мир готов к твоему визиту! ✨</p>
+            </div>
+
+            <!-- ГЕНЕРАТОР ПАСХАЛОК -->
+            <div class="joke-box">
+                <button class="joke-btn" onclick="generateJoke()">🎲 Сгенерировать предсказание на встречу</button>
+                <div class="joke-text" id="jokeText">Миссия обречена на успех, уровень веселья зашкаливает! 🎉</div>
+            </div>
+
+            <!-- ЖДУ ТЕБЯ -->
+            <div class="waiting-text">ЖДУ ТЕБЯ! 🤜🤛</div>
+            
+            <!-- Таймер в формате ЧЧ:ММ:СС -->
+            <div class="timer-box" id="timerBox" onclick="clickTimer()">
+                До старта миссии осталось: <br>
+                <span class="timer-digits" id="hmsTimer">00ч : 00м : 00с</span>
+            </div>
+            
+            <!-- Напоминалка связи -->
+            <div class="contact-hint">Если планы изменятся — напиши в ТГ 📢</div>
+        </div>
+    </div>
+
+    <script>
+        // Музыкальный контроллер
+        const myAudio = document.getElementById('bgMusic');
+        const audioStatus = document.getElementById('audioStatus');
+        const bars = document.querySelectorAll('.music-bar');
+
+        function toggleMusic() {
+            if (myAudio.paused) {
+                myAudio.play().catch(e => console.log("Музыка ждет взаимодействия"));
+                audioStatus.innerText = "МУЗЫКА: ON 🎧";
+                bars.forEach(bar => bar.classList.add('animate'));
+            } else {
+                myAudio.pause();
+                audioStatus.innerText = "МУЗЫКА: OFF 🤫";
+                bars.forEach(bar => bar.classList.remove('animate'));
+            }
+        }
+
+        // Атмосферные частицы на фоне
+        const emojis = ['👾', '✨', '🍿', '🥤', '🍕', '🎮', '🎈', '🎬', '🎵', '💫'];
+        const container = document.getElementById('particleContainer');
+        
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDuration = Math.random() * 2 + 4 + 's';
+            container.appendChild(particle);
+            setTimeout(() => particle.remove(), 6000);
+        }
+        setInterval(createParticle, 600);
+
+        let chosenLocation = "";
+        let chosenTime = "";
+
+        function selectLocation(loc) {
+            const inputContainer = document.getElementById('customLocInput');
+            
+            if (loc === 'custom') {
+                chosenLocation = "custom";
+                inputContainer.style.display = 'block';
+            } else {
+                chosenLocation = loc;
+                inputContainer.style.display = 'none';
+            }
+            
+            document.querySelectorAll('#locationGrid .select-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.innerText.includes(loc) || (loc === 'custom' && btn.id === 'customLocBtn')) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            validateForm();
+        }
+
+        function selectTime(time) {
+            const inputContainer = document.getElementById('customTimeInput');
+            const activityBox = document.getElementById('activityBox');
+            const activityDesc = document.getElementById('activityDesc');
+            
+            activityBox.style.display = 'block';
+            
+            if (time === '12:00' || time === '14:00') {
+                activityDesc.innerText = "🎬 Самый разгар дня. Идеально для прогулки, сытного перекуса или спонтанных приключений.";
+            } else if (time === '16:00' || time === '18:00') {
+                activityDesc.innerText = "🌅 Комфортный вечерний вайб. Время полностью расслабиться и спокойно обсудить все главные новости.";
+            } else if (time === '20:00') {
+                activityDesc.innerText = "🌌 Ночной рейд! Время для огней города, атмосферных разговоров и крутого завершения дня.";
+            } else {
+                activityDesc.innerText = "🔮 Секретный тайминг! Интуиция подсказывает, что это будет самый весёлый и спонтанный план.";
+            }
+            
+            if (time === 'custom') {
+                chosenTime = "custom";
+                inputContainer.style.display = 'block';
+            } else {
+                chosenTime = time;
+                inputContainer.style.display = 'none';
+            }
+            
+            document.querySelectorAll('#timeGrid .select-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.innerText.includes(time) || (time === 'custom' && btn.id === 'customTimeBtn')) {
+                    btn.classList.add('selected');
+                }
+            });
+
+            validateForm();
+        }
+
+        function validateForm() {
+            const submitBtn = document.getElementById('submitBtn');
+            const progressBar = document.getElementById('progressBar');
+            const statusText = document.getElementById('statusText');
+            
+            let isLocValid = chosenLocation !== "" && (chosenLocation !== "custom" || document.getElementById('customLocField').value.trim().length > 1);
+            let isTimeValid = chosenTime !== "" && (chosenTime !== "custom" || document.getElementById('customTimeField').value.trim().length > 1);
+            
+            if (chosenLocation !== "" || chosenTime !== "") {
+                progressBar.style.width = '50%';
+                statusText.innerText = 'Заполнение полетных данных... 📝';
+            }
+            
+            if (isLocValid && isTimeValid) {
+                submitBtn.disabled = false;
+                progressBar.style.width = '85%';
+                statusText.innerText = 'Данные внесены! Жми кнопку ниже 👇';
+            } else {
+                submitBtn.disabled = true;
+            }
+        }
+
+        function handleMoodToggle() {
+            const toggle = document.getElementById('moodToggle');
+            if (!toggle.checked) {
+                alert('🛑 Ошибка системы! Без хорошего настроения доступ к квесту заблокирован. Оставляем включенным!');
+                toggle.checked = true;
+            }
+        }
+
+        const jokes = [
+            "🔮 Этот день активирует +50% к генерации крутых воспоминаний.",
+            "🎯 Миссия обречена на успех, уровень веселья зашкаливает!",
+            "✨ Чит-код на отличную погоду и свободные места в локации успешно активирован.",
+            "🤫 Секретный инсайд: эта прогулка официально продлевает ощущение выходных!",
+            "🎬 Звёзды говорят, что уровень отличных разговоров сегодня пробьёт потолок."
+        ];
+
+        function generateJoke() {
+            const textElement = document.getElementById('jokeText');
+            const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+            textElement.innerText = randomJoke;
+        }
+
+        const radarStatuses = [
+            "✨ Локация работает в режиме повышенного уюта, все готово к визиту!",
+            "🎯 Место зачищено от скуки. Уровень готовности к крутому дню: 100%.",
+            "⚡ Погода шепчет, кондиционеры дуют, свободные места для отдыха обнаружены.",
+            "📦 Атмосфера выбранной точки заряжена на максимальное расслабление.",
+            "🚀 Навигационные спутники подтверждают: это идеальная точка для встречи 4 июня."
+        ];
+
+        function scanRadar() {
+            const textElement = document.getElementById('radarText');
+            const randomStatus = radarStatuses[Math.floor(Math.random() * radarStatuses.length)];
+            textElement.innerText = randomStatus;
+        }
+
+        let totalSeconds = Math.floor(Math.random() * 43200) + 43200; 
+        let isTimerActive = true;
+
+        function updateHMSTimerDisplay() {
+            const timerEl = document.getElementById('hmsTimer');
+            if (!timerEl || !isTimerActive) return;
+
+            let hours = Math.floor(totalSeconds / 3600);
+            let minutes = Math.floor((totalSeconds % 3600) / 60);
+            let seconds = totalSeconds % 60;
+
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            timerEl.innerText = `${hours}ч : ${minutes}м : ${seconds}с`;
+        }
+
+        function startTimer() {
+            updateHMSTimerDisplay();
+            setInterval(() => {
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    updateHMSTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function clickTimer() {
+            const box = document.getElementById('timerBox');
+            isTimerActive = false;
+            box.innerHTML = "✨ Уже скоро! 🚀";
+            setTimeout(() => {
+                isTimerActive = true;
+                box.innerHTML = `До старта миссии осталось: <br><span class="timer-digits" id="hmsTimer">00ч : 00м : 00с</span>`;
+                updateHMSTimerDisplay();
+            }, 1200);
+        }
+
+        function burstConfetti() {
+            const card = document.getElementById('mainCard');
+            const colors = ['#2ec4b6', '#ff9f1c', '#ffbf69', '#ffffff', '#0f766e', '#8b5cf6'];
+            
+            for (let i = 0; i < 45; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti-piece');
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = Math.random() * 140 + 60;
+                const x = Math.cos(angle) * velocity;
+                const y = Math.sin(angle) * velocity;
+                
+                card.appendChild(confetti);
+                
+                confetti.animate([
+                    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) scale(0.2)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 600 + 700,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)',
+                    fill: 'forwards'
+                });
+                
+                setTimeout(() => confetti.remove(), 1300);
+            }
+        }
+
+        function confirmMission() {
+            document.getElementById('progressBar').style.width = '100%';
+            document.getElementById('statusText').innerText = 'Миссия активирована! Уровень: Мастер 🏆';
+
+            document.getElementById('screenInvite').classList.remove('active');
+            document.getElementById('screenSuccess').classList.add('active');
+            
+            let finalTimeText = chosenTime;
+            if (chosenTime === 'custom') {
+                finalTimeText = document.getElementById('customTimeField').value;
+            }
+
+            let finalLocText = chosenLocation;
+            if (chosenLocation === 'custom') {
+                finalLocText = document.getElementById('customLocField').value;
+            }
+            
+            document.getElementById('finalLocation').innerText = `📍 Точка сбора: ${finalLocText}`;
+            document.getElementById('finalTime').innerText = `⏰ Дата и время встречи: 4 июня в ${finalTimeText}`;
+            
+            burstConfetti();
+            startTimer();
+        }
+    </script>
+</body>
+</html>
